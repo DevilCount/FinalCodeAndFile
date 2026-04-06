@@ -1,0 +1,546 @@
+﻿package com.sunyaxin.sample.service.impl;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.sunyaxin.common.constant.OperationTypeConstant;
+import com.sunyaxin.common.constant.SampleStatusConstant;
+import com.sunyaxin.common.entity.OperationLog;
+import com.sunyaxin.common.entity.Sample;
+import com.sunyaxin.common.entity.SampleTrace;
+import com.sunyaxin.common.result.Result;
+import com.sunyaxin.common.service.OperationLogService;
+import com.sunyaxin.common.utils.CodeGenerator;
+import com.sunyaxin.common.utils.RedisUtils;
+import com.sunyaxin.sample.dto.DashboardStatsDTO;
+import com.sunyaxin.sample.dto.SampleStatusStatsDTO;
+import com.sunyaxin.sample.dto.TodoItemDTO;
+import com.sunyaxin.sample.mapper.SampleMapper;
+import com.sunyaxin.sample.mapper.SampleTraceMapper;
+import com.sunyaxin.sample.service.EnhancedSampleService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * 澧炲己鐗堟爣鏈湇鍔″疄鐜扮被
+ * 娣诲姞缂撳瓨鏀寔銆佷华琛ㄧ洏缁熻绛夊姛鑳? */
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class EnhancedSampleServiceImpl extends ServiceImpl<SampleMapper, Sample> implements EnhancedSampleService {
+
+    private final SampleTraceMapper traceMapper;
+    private final OperationLogService operationLogService;
+    private final RedisUtils redisUtils;
+
+    private static final String DASHBOARD_CACHE_KEY = "dashboard:stats";
+    private static final String TODAY_STATS_CACHE_KEY = "stats:today";
+    private static final String STATUS_STATS_CACHE_KEY = "stats:status";
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    @Override
+    @Cacheable(value = "dashboard", key = "'stats'")
+    public DashboardStatsDTO getDashboardStats() {
+        log.info("==> 璁＄畻浠〃鐩樼粺璁℃暟鎹紙缂撳瓨鏈懡涓級");
+        
+        DashboardStatsDTO stats = new DashboardStatsDTO();
+        
+        // 璁剧疆浠婃棩鏍囨湰鎬绘暟锛堝甫缂撳瓨锛?        stats.setTodaySampleCount(getTodaySampleCount());
+        
+        // 璁剧疆浠婃棩鎶ュ憡鎬绘暟锛堟殏鏃惰涓?锛岄渶瑕佽皟鐢ㄦ姤鍛婃湇鍔★級
+        stats.setTodayReportCount(0L);
+        
+        // 璁剧疆寰呭鐞嗘爣鏈暟
+        stats.setPendingSampleCount(getPendingSampleCount());
+        
+        // 璁剧疆寮傚父鎶ュ憡鏁?        stats.setAbnormalReportCount(getAbnormalSampleCount());
+        
+        // 璁剧疆鏍囨湰鐘舵€佸垎甯?        stats.setStatusDistribution(getSampleStatusDistribution());
+        
+        // 璁剧疆杩?澶╂爣鏈秼鍔?        stats.setWeeklyTrend(getWeeklySampleTrend());
+        
+        // 璁剧疆杩?澶╂姤鍛婅秼鍔匡紙鏆傛椂涓虹┖锛?        stats.setWeeklyReportTrend(new HashMap<>());
+        
+        // 璁剧疆妫€楠岄」鐩儹搴︽帓琛?        stats.setHotTestItems(getHotTestItems(10));
+        
+        // 璁剧疆璁惧鐘舵€佺粺璁★紙鏆傛椂涓虹┖锛?        stats.setDeviceStatusStats(new HashMap<>());
+        
+        // 璁剧疆寰呭姙浜嬮」鍒楄〃
+        stats.setTodoList(getTodoList(null));
+        
+        // 璁剧疆鍗辨€ュ€兼彁閱掑垪琛紙鏆傛椂涓虹┖锛?        stats.setPanicAlerts(new ArrayList<>());
+        
+        return stats;
+    }
+
+    @Override
+    @CacheEvict(value = "dashboard", key = "'stats'")
+    public void clearDashboardCache() {
+        log.info("==> 娓呴櫎浠〃鐩樼紦瀛?);
+    }
+
+    @Override
+    @Cacheable(value = "statistics", key = "'status'")
+    public Map<String, Long> countByStatus() {
+        log.info("==> 缁熻鏍囨湰鐘舵€佸垎甯冿紙缂撳瓨鏈懡涓級");
+        
+        Map<String, Long> result = new HashMap<>();
+        
+        // 鏌ヨ鎵€鏈夌姸鎬佺殑鏁伴噺
+        List<Sample> samples = this.list();
+        
+        // 鎸夌姸鎬佸垎缁勭粺璁?        Map<String, Long> countByStatus = samples.stream()
+                .collect(Collectors.groupingBy(Sample::getStatus, Collectors.counting()));
+        
+        // 纭繚鎵€鏈夌姸鎬侀兘鏈夊€硷紙鍗充娇鏄?锛?        for (String status : SampleStatusConstant.getAllStatuses()) {
+            result.put(status, countByStatus.getOrDefault(status, 0L));
+        }
+        
+        return result;
+    }
+
+    @Override
+    public Map<String, Long> countByLastDays(int days) {
+        log.info("==> 缁熻鏈€杩憑}澶╂爣鏈暟閲?, days);
+        
+        Map<String, Long> result = new LinkedHashMap<>();
+        LocalDate today = LocalDate.now();
+        
+        for (int i = days - 1; i >= 0; i--) {
+            LocalDate date = today.minusDays(i);
+            Long count = baseMapper.countByDate(date);
+            result.put(date.format(DATE_FORMATTER), count);
+        }
+        
+        return result;
+    }
+
+    @Override
+    @Cacheable(value = "statistics", key = "'today'")
+    public Map<String, Object> getTodayStats() {
+        log.info("==> 鑾峰彇浠婃棩缁熻锛堢紦瀛樻湭鍛戒腑锛?);
+        
+        Map<String, Object> stats = new HashMap<>();
+        
+        // 浠婃棩鏍囨湰鎬绘暟
+        Long todayCount = baseMapper.countToday();
+        stats.put("todaySampleCount", todayCount);
+        
+        // 浠婃棩鍚勭姸鎬佹爣鏈暟閲?        List<Map<String, Object>> statusCounts = baseMapper.countByStatusToday();
+        Map<String, Long> statusMap = statusCounts.stream()
+                .collect(Collectors.toMap(
+                        map -> (String) map.get("status"),
+                        map -> ((Number) map.get("count")).longValue()
+                ));
+        
+        // 纭繚鎵€鏈夌姸鎬侀兘鏈夊€?        for (String status : SampleStatusConstant.getAllStatuses()) {
+            statusMap.putIfAbsent(status, 0L);
+        }
+        
+        stats.put("statusCounts", statusMap);
+        
+        // 浠婃棩鐑棬妫€楠岄」鐩?        List<Map<String, Object>> hotItems = baseMapper.hotTestItemsToday();
+        stats.put("hotTestItems", hotItems);
+        
+        // 浠婃棩寮傚父鏍囨湰
+        List<Sample> abnormalSamples = baseMapper.selectAbnormalSamples(10);
+        stats.put("abnormalSamples", abnormalSamples);
+        
+        // 浠婃棩寰呭鐞嗘爣鏈?        List<Sample> pendingSamples = baseMapper.selectPendingSamples(10);
+        stats.put("pendingSamples", pendingSamples);
+        
+        return stats;
+    }
+
+    @Override
+    public List<TodoItemDTO> getTodoList(Long userId) {
+        log.info("==> 鑾峰彇寰呭姙浜嬮」鍒楄〃锛岀敤鎴稩D: {}", userId);
+        
+        List<TodoItemDTO> todoList = new ArrayList<>();
+        
+        // 寰呮帴鏀舵爣鏈?        List<Sample> pendingReceiveSamples = baseMapper.selectPendingSamples(10);
+        for (Sample sample : pendingReceiveSamples) {
+            if (SampleStatusConstant.COLLECTED.equals(sample.getStatus()) || 
+                SampleStatusConstant.IN_TRANSIT.equals(sample.getStatus())) {
+                TodoItemDTO todo = new TodoItemDTO();
+                todo.setId(sample.getId());
+                todo.setType("SAMPLE_RECEIVE");
+                todo.setTitle("鏍囨湰鎺ユ敹寰呭鐞?);
+                todo.setDescription("鏍囨湰缂栧彿: " + sample.getSampleNo() + "锛屾偅鑰? " + sample.getPatientName());
+                todo.setRelatedId(sample.getId());
+                todo.setRelatedNo(sample.getSampleNo());
+                todo.setPriority("HIGH");
+                todo.setDeadline(sample.getCollectTime().plusHours(24)); // 24灏忔椂鍐呭鐞?                todo.setCreateTime(sample.getCreateTime());
+                todo.setStatus("PENDING");
+                todoList.add(todo);
+            }
+        }
+        
+        // 妫€楠屼腑鏍囨湰锛堥渶瀹屾垚妫€楠岋級
+        List<Sample> testingSamples = this.lambdaQuery()
+                .eq(Sample::getStatus, SampleStatusConstant.TESTING)
+                .orderByDesc(Sample::getCreateTime)
+                .last("LIMIT 10")
+                .list();
+        
+        for (Sample sample : testingSamples) {
+            TodoItemDTO todo = new TodoItemDTO();
+            todo.setId(sample.getId());
+            todo.setType("SAMPLE_TEST");
+            todo.setTitle("鏍囨湰妫€楠屽緟瀹屾垚");
+            todo.setDescription("鏍囨湰缂栧彿: " + sample.getSampleNo() + "锛屾偅鑰? " + sample.getPatientName());
+            todo.setRelatedId(sample.getId());
+            todo.setRelatedNo(sample.getSampleNo());
+            todo.setPriority("MEDIUM");
+            todo.setDeadline(sample.getCreateTime().plusHours(48)); // 48灏忔椂鍐呭畬鎴?            todo.setCreateTime(sample.getCreateTime());
+            todo.setStatus("PROCESSING");
+            todoList.add(todo);
+        }
+        
+        // 寮傚父鏍囨湰锛堥渶澶勭悊锛?        List<Sample> abnormalSamples = baseMapper.selectAbnormalSamples(10);
+        for (Sample sample : abnormalSamples) {
+            TodoItemDTO todo = new TodoItemDTO();
+            todo.setId(sample.getId());
+            todo.setType("SAMPLE_ABNORMAL");
+            todo.setTitle("寮傚父鏍囨湰寰呭鐞?);
+            todo.setDescription("鏍囨湰缂栧彿: " + sample.getSampleNo() + "锛屾偅鑰? " + sample.getPatientName() + "锛岀姸鎬? 寮傚父");
+            todo.setRelatedId(sample.getId());
+            todo.setRelatedNo(sample.getSampleNo());
+            todo.setPriority("HIGH");
+            todo.setDeadline(LocalDateTime.now().plusHours(4)); // 4灏忔椂鍐呭鐞?            todo.setCreateTime(sample.getUpdateTime());
+            todo.setStatus("PENDING");
+            todoList.add(todo);
+        }
+        
+        return todoList;
+    }
+
+    @Override
+    public List<Map<String, Object>> getHotTestItems(int limit) {
+        log.info("==> 鑾峰彇鐑棬妫€楠岄」鐩帓琛岋紝闄愬埗: {}", limit);
+        
+        List<Map<String, Object>> hotItems = baseMapper.hotTestItemsToday();
+        
+        // 濡傛灉浠婃棩鏁版嵁涓嶈冻锛屼娇鐢ㄦ渶杩?澶╂暟鎹?        if (hotItems.size() < 5) {
+            // 杩欓噷鍙互鎵╁睍鏌ヨ鏈€杩?澶╃殑鐑棬椤圭洰
+            // 鏆傛椂杩斿洖浠婃棩鏁版嵁
+        }
+        
+        return hotItems.stream().limit(limit).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = {"dashboard", "statistics"}, allEntries = true)
+    public Result<String> batchUpdateStatus(List<Long> sampleIds, String status, Long operatorId, String operatorName) {
+        log.info("==> 鎵归噺鏇存柊鏍囨湰鐘舵€侊紝鏍囨湰鏁伴噺: {}, 鐩爣鐘舵€? {}", sampleIds.size(), status);
+        
+        if (sampleIds == null || sampleIds.isEmpty()) {
+            return Result.error("鏍囨湰ID鍒楄〃涓嶈兘涓虹┖");
+        }
+        
+        // 楠岃瘉鐘舵€佹湁鏁堟€?        if (!isValidStatus(status)) {
+            return Result.error("鏃犳晥鐨勭姸鎬? " + status);
+        }
+        
+        int successCount = 0;
+        int failCount = 0;
+        List<String> errorMessages = new ArrayList<>();
+        
+        for (Long sampleId : sampleIds) {
+            try {
+                Sample sample = this.getById(sampleId);
+                if (sample == null) {
+                    failCount++;
+                    errorMessages.add("鏍囨湰ID " + sampleId + " 涓嶅瓨鍦?);
+                    continue;
+                }
+                
+                String oldStatus = sample.getStatus();
+                sample.setStatus(status);
+                
+                // 鏍规嵁鐘舵€佹洿鏂扮浉鍏冲瓧娈?                if (SampleStatusConstant.RECEIVED.equals(status)) {
+                    sample.setReceiveTime(LocalDateTime.now());
+                    sample.setTechnicianId(operatorId);
+                    sample.setTechnicianName(operatorName);
+                }
+                
+                this.updateById(sample);
+                
+                // 鍒涘缓杩借釜璁板綍
+                SampleTrace trace = new SampleTrace();
+                trace.setSampleId(sampleId);
+                trace.setSampleNo(sample.getSampleNo());
+                trace.setOperationType(status);
+                trace.setOperationDesc(getStatusDesc(status));
+                trace.setOperatorId(operatorId);
+                trace.setOperatorName(operatorName);
+                trace.setLocation("鎵归噺鎿嶄綔");
+                traceMapper.insert(trace);
+                
+                successCount++;
+                
+            } catch (Exception e) {
+                failCount++;
+                errorMessages.add("鏍囨湰ID " + sampleId + " 鏇存柊澶辫触: " + e.getMessage());
+                log.error("鎵归噺鏇存柊鏍囨湰鐘舵€佸け璐ワ紝鏍囨湰ID: {}", sampleId, e);
+            }
+        }
+        
+        // 璁板綍鎿嶄綔鏃ュ織
+        String operationDesc = "鎵归噺鏇存柊鏍囨湰鐘舵€侊紝鎴愬姛: " + successCount + "锛屽け璐? " + failCount;
+        operationLogService.recordOperation(
+                OperationTypeConstant.MODULE_SAMPLE,
+                "BATCH_OPERATION",
+                operationDesc,
+                "Sample",
+                null,
+                null,
+                operatorId,
+                operatorName,
+                "鐩爣鐘舵€? " + status
+        );
+        
+        log.info("==> 鎵归噺鏇存柊瀹屾垚锛屾垚鍔? {}, 澶辫触: {}", successCount, failCount);
+        
+        if (failCount > 0) {
+            return Result.success("鎵归噺鏇存柊閮ㄥ垎鎴愬姛锛屾垚鍔? + successCount + "鏉★紝澶辫触" + failCount + "鏉?, String.join("; ", errorMessages));
+        }
+        
+        return Result.success("鎵归噺鏇存柊鎴愬姛锛屽叡鏇存柊" + successCount + "鏉¤褰?);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = {"dashboard", "statistics"}, allEntries = true)
+    public Result<String> batchDelete(List<Long> sampleIds, Long operatorId, String operatorName) {
+        log.info("==> 鎵归噺鍒犻櫎鏍囨湰锛屾爣鏈暟閲? {}", sampleIds.size());
+        
+        if (sampleIds == null || sampleIds.isEmpty()) {
+            return Result.error("鏍囨湰ID鍒楄〃涓嶈兘涓虹┖");
+        }
+        
+        int successCount = 0;
+        int failCount = 0;
+        List<String> errorMessages = new ArrayList<>();
+        
+        for (Long sampleId : sampleIds) {
+            try {
+                Sample sample = this.getById(sampleId);
+                if (sample == null) {
+                    failCount++;
+                    errorMessages.add("鏍囨湰ID " + sampleId + " 涓嶅瓨鍦?);
+                    continue;
+                }
+                
+                // 閫昏緫鍒犻櫎
+                this.removeById(sampleId);
+                
+                successCount++;
+                
+            } catch (Exception e) {
+                failCount++;
+                errorMessages.add("鏍囨湰ID " + sampleId + " 鍒犻櫎澶辫触: " + e.getMessage());
+                log.error("鎵归噺鍒犻櫎鏍囨湰澶辫触锛屾爣鏈琁D: {}", sampleId, e);
+            }
+        }
+        
+        // 璁板綍鎿嶄綔鏃ュ織
+        String operationDesc = "鎵归噺鍒犻櫎鏍囨湰锛屾垚鍔? " + successCount + "锛屽け璐? " + failCount;
+        operationLogService.recordOperation(
+                OperationTypeConstant.MODULE_SAMPLE,
+                "BATCH_DELETE",
+                operationDesc,
+                "Sample",
+                null,
+                null,
+                operatorId,
+                operatorName,
+                "鍒犻櫎鏁伴噺: " + sampleIds.size()
+        );
+        
+        log.info("==> 鎵归噺鍒犻櫎瀹屾垚锛屾垚鍔? {}, 澶辫触: {}", successCount, failCount);
+        
+        if (failCount > 0) {
+            return Result.success("鎵归噺鍒犻櫎閮ㄥ垎鎴愬姛锛屾垚鍔? + successCount + "鏉★紝澶辫触" + failCount + "鏉?, String.join("; ", errorMessages));
+        }
+        
+        return Result.success("鎵归噺鍒犻櫎鎴愬姛锛屽叡鍒犻櫎" + successCount + "鏉¤褰?);
+    }
+
+    @Override
+    public byte[] exportSamplesToExcel(String keyword, String status, String sampleType, LocalDate startDate, LocalDate endDate) {
+        log.info("==> 瀵煎嚭鏍囨湰鏁版嵁鍒癊xcel锛屾潯浠? keyword={}, status={}, sampleType={}, startDate={}, endDate={}", 
+                keyword, status, sampleType, startDate, endDate);
+        
+        // 鏌ヨ鏁版嵁
+        List<Sample> samples = baseMapper.selectSampleList(keyword, status, sampleType, startDate, endDate);
+        
+        // TODO: 瀹炵幇Excel瀵煎嚭閫昏緫
+        // 杩欓噷鍙互闆嗘垚EasyExcel鎴朅pache POI
+        // 鏆傛椂杩斿洖绌烘暟缁?        
+        log.info("==> 瀵煎嚭鏁版嵁鎴愬姛锛岃褰曟暟: {}", samples.size());
+        return new byte[0];
+    }
+
+    @Override
+    public Result<String> importSamplesFromExcel(byte[] excelData, Long operatorId, String operatorName) {
+        log.info("==> 浠嶦xcel瀵煎叆鏍囨湰鏁版嵁锛屾暟鎹ぇ灏? {} bytes", excelData.length);
+        
+        // TODO: 瀹炵幇Excel瀵煎叆閫昏緫
+        // 杩欓噷鍙互闆嗘垚EasyExcel鎴朅pache POI
+        
+        // 璁板綍鎿嶄綔鏃ュ織
+        operationLogService.recordOperation(
+                OperationTypeConstant.MODULE_SAMPLE,
+                "BATCH_IMPORT",
+                "浠嶦xcel瀵煎叆鏍囨湰鏁版嵁",
+                "Sample",
+                null,
+                null,
+                operatorId,
+                operatorName,
+                "瀵煎叆鏂囦欢澶у皬: " + excelData.length + " bytes"
+        );
+        
+        return Result.success("Excel瀵煎叆鍔熻兘寮€鍙戜腑");
+    }
+
+    // ==================== 绉佹湁杈呭姪鏂规硶 ====================
+
+    /**
+     * 鑾峰彇浠婃棩鏍囨湰鎬绘暟锛堝甫缂撳瓨锛?     */
+    private Long getTodaySampleCount() {
+        String cacheKey = TODAY_STATS_CACHE_KEY + ":todayCount";
+        Long count = redisUtils.get(cacheKey);
+        
+        if (count == null) {
+            count = baseMapper.countToday();
+            redisUtils.setEx(cacheKey, count, 300); // 缂撳瓨5鍒嗛挓
+        }
+        
+        return count;
+    }
+
+    /**
+     * 鑾峰彇寰呭鐞嗘爣鏈暟
+     */
+    private Long getPendingSampleCount() {
+        // 寰呭鐞嗙姸鎬侊細宸查噰闆嗐€佽繍杈撲腑銆佸凡鎺ユ敹
+        return this.lambdaQuery()
+                .in(Sample::getStatus, Arrays.asList(
+                        SampleStatusConstant.COLLECTED,
+                        SampleStatusConstant.IN_TRANSIT,
+                        SampleStatusConstant.RECEIVED
+                ))
+                .count();
+    }
+
+    /**
+     * 鑾峰彇寮傚父鏍囨湰鏁?     */
+    private Long getAbnormalSampleCount() {
+        return this.lambdaQuery()
+                .eq(Sample::getStatus, SampleStatusConstant.ABNORMAL)
+                .count();
+    }
+
+    /**
+     * 鑾峰彇鏍囨湰鐘舵€佸垎甯?     */
+    private List<SampleStatusStatsDTO> getSampleStatusDistribution() {
+        List<SampleStatusStatsDTO> distribution = new ArrayList<>();
+        
+        // 鑾峰彇鍚勭姸鎬佹暟閲?        Map<String, Long> statusCounts = countByStatus();
+        
+        // 璁＄畻鎬绘暟
+        Long total = statusCounts.values().stream().mapToLong(Long::longValue).sum();
+        
+        // 璁＄畻鏄ㄦ棩鏁版嵁鐢ㄤ簬瀵规瘮
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        List<Map<String, Object>> yesterdayCounts = baseMapper.countByStatusByDate(yesterday);
+        Map<String, Long> yesterdayMap = yesterdayCounts.stream()
+                .collect(Collectors.toMap(
+                        map -> (String) map.get("status"),
+                        map -> ((Number) map.get("count")).longValue()
+                ));
+        
+        // 鏋勫缓鐘舵€佸垎甯僁TO
+        for (Map.Entry<String, Long> entry : statusCounts.entrySet()) {
+            String status = entry.getKey();
+            Long count = entry.getValue();
+            
+            SampleStatusStatsDTO stats = new SampleStatusStatsDTO();
+            stats.setStatus(status);
+            stats.setStatusName(getStatusDesc(status));
+            stats.setCount(count);
+            
+            // 璁＄畻鐧惧垎姣?            if (total > 0) {
+                stats.setPercentage((count.doubleValue() / total) * 100);
+            } else {
+                stats.setPercentage(0.0);
+            }
+            
+            // 璁＄畻杈冩槰鏃ュ彉鍖?            Long yesterdayCount = yesterdayMap.getOrDefault(status, 0L);
+            stats.setChangeFromYesterday(count - yesterdayCount);
+            
+            distribution.add(stats);
+        }
+        
+        return distribution;
+    }
+
+    /**
+     * 鑾峰彇鏈€杩?澶╂爣鏈秼鍔?     */
+    private Map<String, Long> getWeeklySampleTrend() {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(6); // 鏈€杩?澶?        
+        List<Map<String, Object>> trendData = baseMapper.countByDateRange(startDate, endDate);
+        
+        Map<String, Long> trendMap = new LinkedHashMap<>();
+        
+        // 鍒濆鍖栨渶杩?澶?        for (int i = 6; i >= 0; i--) {
+            LocalDate date = endDate.minusDays(i);
+            trendMap.put(date.format(DATE_FORMATTER), 0L);
+        }
+        
+        // 濉厖瀹為檯鏁版嵁
+        for (Map<String, Object> data : trendData) {
+            String date = data.get("date").toString();
+            Long count = ((Number) data.get("count")).longValue();
+            trendMap.put(date, count);
+        }
+        
+        return trendMap;
+    }
+
+    /**
+     * 鑾峰彇鐘舵€佹弿杩?     */
+    private String getStatusDesc(String status) {
+        Map<String, String> descMap = new HashMap<>();
+        descMap.put(SampleStatusConstant.COLLECTED, "宸查噰闆?);
+        descMap.put(SampleStatusConstant.IN_TRANSIT, "杩愯緭涓?);
+        descMap.put(SampleStatusConstant.RECEIVED, "宸叉帴鏀?);
+        descMap.put(SampleStatusConstant.TESTING, "妫€楠屼腑");
+        descMap.put(SampleStatusConstant.COMPLETED, "宸插畬鎴?);
+        descMap.put(SampleStatusConstant.ARCHIVED, "宸插綊妗?);
+        descMap.put(SampleStatusConstant.ABNORMAL, "寮傚父");
+        return descMap.getOrDefault(status, "鏈煡鐘舵€?);
+    }    private boolean isValidStatus(String status) {
+        return Arrays.asList(
+            SampleStatusConstant.COLLECTED,
+            SampleStatusConstant.IN_TRANSIT,
+            SampleStatusConstant.RECEIVED,
+            SampleStatusConstant.TESTING,
+            SampleStatusConstant.COMPLETED,
+            SampleStatusConstant.ARCHIVED,
+            SampleStatusConstant.ABNORMAL
+        ).contains(status);
+    }
+}

@@ -1,0 +1,4 @@
+# 实验室管理系统 - Selenium自动化测试依赖
+
+selenium==4.15.2
+webdriver-manager==4.0.1

@@ -1,0 +1,92 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: lab-ai-service
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        server-addr: ${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+        namespace: ${NACOS_NAMESPACE:lab-dev}
+        weight: 1
+        metadata:
+          version: 1.0.0
+  
+  # Redis配置
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DB:3}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: 5000ms
+        shutdown-timeout: 100ms
+  
+  # Spring Cache配置
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000  # 10分钟默认TTL（AI诊断结果）
+      cache-null-values: false
+      use-key-prefix: true
+      key-prefix: "lab:"
+
+# Actuator配置（无数据库，禁用db健康检查）
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+    info:
+      enabled: true
+  server:
+    port: 8089
+  health:
+    db:
+      enabled: false
+    redis:
+      enabled: false
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.sunyaxin: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+  file:
+    name: logs/ai-service.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 100MB
+
+# AI配置
+ai:
+  # 第三方AI API配置（如需接入外部API）
+  api:
+    enabled: false
+    url: https://api.example.com/ai
+    key: your-api-key-here
+    timeout: 10000
+  
+  # 本地规则引擎配置
+  local:
+    enabled: true
+    confidence-threshold: 0.8

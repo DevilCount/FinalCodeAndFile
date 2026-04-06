@@ -1,0 +1,544 @@
+/* 医疗系统专业全局样式 - 优化版 */
+
+// 变量定义
+:root {
+  // ==================== 医疗系统专业配色方案 ====================
+  // 主色调 - 医疗蓝（代表专业、信任、冷静）
+  --primary-color: #1e88e5;
+  --primary-light: #42a5f5;
+  --primary-dark: #1565c0;
+  --primary-bg: #e3f2fd;
+  
+  // 成功色 - 生命绿（代表健康、安全）
+  --success-color: #2e7d32;
+  --success-light: #4caf50;
+  --success-dark: #1b5e20;
+  --success-bg: #e8f5e9;
+  
+  // 警告色 - 温暖橙（代表注意、关怀）
+  --warning-color: #ef6c00;
+  --warning-light: #ff9800;
+  --warning-dark: #e65100;
+  --warning-bg: #fff3e0;
+  
+  // 危险色 - 警示红（代表紧急、需要关注）
+  --danger-color: #c62828;
+  --danger-light: #ef5350;
+  --danger-dark: #b71c1c;
+  --danger-bg: #ffebee;
+  
+  // 信息色 - 中性灰
+  --info-color: #546e7a;
+  --info-light: #78909c;
+  --info-dark: #37474f;
+  --info-bg: #eceff1;
+  
+  // 医疗系统特色色
+  --medical-purple: #7b1fa2;    // 代表医疗科研
+  --medical-teal: #00796b;      // 代表消毒卫生
+  --medical-indigo: #303f9f;    // 代表医学影像
+  
+  // ==================== 背景色系统 ====================
+  --bg-color: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-tertiary: #e2e8f0;
+  --card-bg: #ffffff;
+  --card-hover-bg: #fafbfc;
+  
+  // ==================== 文本颜色系统 ====================
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  --text-light: #94a3b8;
+  --text-disabled: #cbd5e1;
+  --text-white: #ffffff;
+  
+  // ==================== 边框颜色系统 ====================
+  --border-color: #e2e8f0;
+  --border-light: #f1f5f9;
+  --border-dark: #cbd5e1;
+  --border-focus: var(--primary-color);
+  
+  // ==================== 阴影系统 ====================
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 8px 32px rgba(30, 136, 229, 0.15);
+  
+  // ==================== 间距系统 ====================
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  
+  // ==================== 圆角系统 ====================
+  --border-radius-xs: 4px;
+  --border-radius-sm: 6px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --border-radius-full: 9999px;
+  
+  // ==================== 字体系统 ====================
+  --font-family: 'Inter', -apple-system, 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  --font-family-mono: 'SF Mono', Monaco, 'Fira Code', 'Roboto Mono', Consolas, monospace;
+  
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  --font-size-4xl: 32px;
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  // ==================== 过渡动画 ====================
+  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  // ==================== Z-index层级 ====================
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}
+
+// ==================== 全局重置 ====================
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+  background-color: var(--bg-color);
+  line-height: 1.6;
+}
+
+// 选择文本样式
+::selection {
+  background-color: var(--primary-bg);
+  color: var(--primary-dark);
+}
+
+// ==================== 滚动条美化 ====================
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius-full);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-dark);
+  border-radius: var(--border-radius-full);
+  
+  &:hover {
+    background: var(--info-color);
+  }
+}
+
+// ==================== 通用工具类 ====================
+.container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+.container-fluid {
+  width: 100%;
+  padding: 0 var(--spacing-lg);
+}
+
+// ==================== 页面头部样式 ====================
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: linear-gradient(135deg, var(--card-bg) 0%, #fbfdff 100%);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+}
+
+.page-title {
+  margin: 0;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  
+  .el-icon {
+    color: var(--primary-color);
+  }
+}
+
+.page-subtitle {
+  color: var(--text-tertiary);
+  margin: var(--spacing-xs) 0 0 0;
+  font-size: var(--font-size-sm);
+}
+
+// ==================== 卡片样式优化 ====================
+.card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  transition: var(--transition);
+  border: 1px solid var(--border-light);
+  
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+}
+
+// ==================== 按钮样式优化 ====================
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  border: 1px solid transparent;
+  outline: none;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &:focus-visible {
+    box-shadow: 0 0 0 3px var(--primary-bg);
+  }
+  
+  &.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+    color: var(--text-white);
+    border-color: var(--primary-color);
+    
+    &:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    }
+  }
+  
+  &.btn-success {
+    background: linear-gradient(135deg, var(--success-color) 0%, var(--success-light) 100%);
+    color: var(--text-white);
+    border-color: var(--success-color);
+    
+    &:hover {
+      background: linear-gradient(135deg, var(--success-dark) 0%, var(--success-color) 100%);
+    }
+  }
+  
+  &.btn-warning {
+    background: linear-gradient(135deg, var(--warning-color) 0%, var(--warning-light) 100%);
+    color: var(--text-white);
+    border-color: var(--warning-color);
+    
+    &:hover {
+      background: linear-gradient(135deg, var(--warning-dark) 0%, var(--warning-color) 100%);
+    }
+  }
+  
+  &.btn-danger {
+    background: linear-gradient(135deg, var(--danger-color) 0%, var(--danger-light) 100%);
+    color: var(--text-white);
+    border-color: var(--danger-color);
+    
+    &:hover {
+      background: linear-gradient(135deg, var(--danger-dark) 0%, var(--danger-color) 100%);
+    }
+  }
+  
+  &.btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    
+    &:hover {
+      background-color: var(--bg-secondary);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+  }
+}
+
+// ==================== 统计卡片样式 ====================
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, var(--card-bg) 0%, #fbfdff 100%);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  transition: var(--transition);
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+.stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: var(--text-white);
+  flex-shrink: 0;
+}
+
+.stat-value {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+  margin-top: var(--spacing-xs);
+}
+
+// ==================== 表单样式优化 ====================
+.form {
+  .form-item {
+    margin-bottom: var(--spacing-lg);
+    
+    label {
+      display: block;
+      margin-bottom: var(--spacing-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--text-secondary);
+      font-size: var(--font-size-sm);
+    }
+    
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-md);
+      font-size: var(--font-size-md);
+      transition: var(--transition-fast);
+      background-color: var(--card-bg);
+      
+      &:hover {
+        border-color: var(--info-light);
+      }
+      
+      &:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px var(--primary-bg);
+      }
+      
+      &:disabled {
+        background-color: var(--bg-secondary);
+        color: var(--text-disabled);
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// ==================== 表格样式优化 ====================
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  
+  th,
+  td {
+    padding: var(--spacing-md);
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+  }
+  
+  th {
+    background-color: var(--bg-secondary);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  tbody tr {
+    transition: var(--transition-fast);
+    
+    &:hover {
+      background-color: var(--bg-secondary);
+    }
+  }
+}
+
+// ==================== 筛选卡片样式 ====================
+.filter-card {
+  margin-bottom: var(--spacing-lg);
+  border-radius: var(--border-radius-xl) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--border-light) !important;
+  
+  :deep(.el-card__body) {
+    padding: var(--spacing-lg);
+  }
+}
+
+.filter-row {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-input {
+  width: 320px;
+}
+
+// ==================== 表格卡片样式 ====================
+.table-card {
+  border-radius: var(--border-radius-xl) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--border-light) !important;
+  overflow: hidden;
+  
+  :deep(.el-card__body) {
+    padding: 0;
+  }
+  
+  :deep(.el-table) {
+    border-radius: 0;
+  }
+  
+  .pagination-wrapper {
+    padding: var(--spacing-lg);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: var(--bg-secondary);
+    border-top: 1px solid var(--border-light);
+  }
+}
+
+// ==================== 加载动画 ====================
+.loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border-light);
+  border-radius: var(--border-radius-full);
+  border-top-color: var(--primary-color);
+  animation: spin 0.8s linear infinite;
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+}
+
+// ==================== 页面容器 ====================
+.page-container {
+  padding: var(--spacing-xl);
+  background: linear-gradient(180deg, var(--bg-color) 0%, var(--bg-secondary) 100%);
+  min-height: 100%;
+}
+
+// ==================== 响应式设计 ====================
+@media (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --font-size-md: 14px;
+    --font-size-lg: 16px;
+    --font-size-xl: 18px;
+    --font-size-3xl: 20px;
+    --font-size-4xl: 28px;
+  }
+  
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .search-input {
+    width: 100%;
+  }
+  
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

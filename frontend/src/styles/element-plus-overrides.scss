@@ -1,0 +1,449 @@
+/* ============================================
+ * Element Plus 医疗系统专业主题
+ * 使用 CSS 变量覆盖默认主题
+ * ============================================ */
+
+:root {
+  /* ===== 品牌主色 ===== */
+  --el-color-primary: #1e88e5;
+  --el-color-primary-light-3: #64b5f6;
+  --el-color-primary-light-5: #90caf9;
+  --el-color-primary-light-7: #bbdefb;
+  --el-color-primary-light-8: #d4e5f7;
+  --el-color-primary-light-9: #e3f2fd;
+  --el-color-primary-dark-2: #1565c0;
+
+  /* ===== 功能色 - 成功/警告/危险/信息 ===== */
+  --el-color-success: #2e7d32;
+  --el-color-success-light-3: #66bb6a;
+  --el-color-success-light-5: #81c784;
+  --el-color-success-light-7: #a5d6a7;
+  --el-color-success-light-9: #e8f5e9;
+
+  --el-color-warning: #ef6c00;
+  --el-color-warning-light-3: #ffa726;
+  --el-color-warning-light-5: #ffb74d;
+  --el-color-warning-light-7: #ffcc80;
+  --el-color-warning-light-9: #fff3e0;
+
+  --el-color-danger: #c62828;
+  --el-color-danger-light-3: #ef5350;
+  --el-color-danger-light-5: #e57373;
+  --el-color-danger-light-7: #ef9a9a;
+  --el-color-danger-light-9: #ffebee;
+
+  --el-color-info: #546e7a;
+  --el-color-info-light-3: #78909c;
+  --el-color-info-light-5: #90a4ae;
+  --el-color-info-light-7: #b0bec5;
+  --el-color-info-light-9: #eceff1;
+
+  /* ===== 文字颜色 ===== */
+  --el-text-color-primary: #1e293b;
+  --el-text-color-regular: #475569;
+  --el-text-color-secondary: #64748b;
+  --el-text-color-placeholder: #94a3b8;
+  --el-text-color-disabled: #cbd5e1;
+
+  /* ===== 边框颜色 ===== */
+  --el-border-color: #e2e8f0;
+  --el-border-color-light: #f1f5f9;
+  --el-border-color-lighter: #f8fafc;
+  --el-border-color-extra-light: #ffffff;
+
+  /* ===== 填充色 ===== */
+  --el-fill-color: #f8fafc;
+  --el-fill-color-light: #f1f5f9;
+  --el-fill-color-lighter: #f8fafc;
+  --el-fill-color-extra-light: #fafbfc;
+  --el-fill-color-dark: #e2e8f0;
+  --el-fill-color-darker: #cbd5e1;
+  --el-fill-color-blank: #ffffff;
+
+  /* ===== 背景色 ===== */
+  --el-bg-color: #ffffff;
+  --el-bg-color-page: #f8fafc;
+  --el-bg-color-overlay: #ffffff;
+
+  /* ===== 圆角 ===== */
+  --el-border-radius-base: 8px;
+  --el-border-radius-small: 6px;
+  --el-border-radius-round: 20px;
+  --el-border-radius-circle: 100%;
+
+  /* ===== 阴影 ===== */
+  --el-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  --el-box-shadow-light: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --el-box-shadow-lighter: 0 1px 4px rgba(0, 0, 0, 0.03);
+  --el-box-shadow-dark: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+  /* ===== 字体 ===== */
+  --el-font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  --el-font-size-extra-large: 20px;
+  --el-font-size-large: 18px;
+  --el-font-size-medium: 16px;
+  --el-font-size-base: 14px;
+  --el-font-size-small: 13px;
+  --el-font-size-extra-small: 12px;
+  --el-font-weight-primary: 500;
+  --el-font-weight-secondary: 600;
+
+  /* ===== 间距 ===== */
+  --el-spacing-base: 16px;
+
+  /* ===== 过渡动画 ===== */
+  --el-transition-duration: 0.2s;
+  --el-transition-duration-fast: 0.1s;
+
+  /* ===== 禁用状态 ===== */
+  --el-disabled-bg-color: #f1f5f9;
+  --el-disabled-text-color: #cbd5e1;
+  --el-disabled-border-color: #e2e8f0;
+}
+
+/* ============================================
+ * 组件级主题覆盖
+ * ============================================ */
+
+/* 按钮主题 - 医疗风格渐变 */
+.el-button--primary {
+  background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+  border-color: #1e88e5;
+
+  &:hover,
+  &:focus {
+    background: linear-gradient(135deg, #1565c0 0%, #1e88e5 100%);
+    border-color: #1565c0;
+  }
+
+  &:active {
+    background: #1565c0;
+    border-color: #1565c0;
+  }
+}
+
+.el-button--success {
+  background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+  border-color: #2e7d32;
+
+  &:hover,
+  &:focus {
+    background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+    border-color: #1b5e20;
+  }
+}
+
+.el-button--warning {
+  background: linear-gradient(135deg, #ef6c00 0%, #ff9800 100%);
+  border-color: #ef6c00;
+
+  &:hover,
+  &:focus {
+    background: linear-gradient(135deg, #e65100 0%, #ef6c00 100%);
+    border-color: #e65100;
+  }
+}
+
+.el-button--danger {
+  background: linear-gradient(135deg, #c62828 0%, #ef5350 100%);
+  border-color: #c62828;
+
+  &:hover,
+  &:focus {
+    background: linear-gradient(135deg, #b71c1c 0%, #c62828 100%);
+    border-color: #b71c1c;
+  }
+}
+
+/* 输入框主题 - 医疗风格圆角和聚焦效果 */
+.el-input__wrapper {
+  box-shadow: 0 0 0 1px #e2e8f0 inset;
+  border-radius: var(--el-border-radius-base);
+  transition: all var(--el-transition-duration);
+
+  &:hover {
+    box-shadow: 0 0 0 1px #90a4ae inset;
+  }
+
+  &.is-focus {
+    box-shadow: 0 0 0 1px #1e88e5 inset, 0 0 0 4px rgba(30, 136, 229, 0.1);
+  }
+}
+
+/* 表格主题 - 医疗数据展示优化 */
+.el-table {
+  --el-table-border-color: #e2e8f0;
+  --el-table-row-hover-bg-color: #f8fafc;
+  --el-table-header-bg-color: #f1f5f9;
+  --el-table-tr-bg-color: #ffffff;
+  --el-table-text-color: #475569;
+  --el-table-header-text-color: #64748b;
+  border-radius: var(--el-border-radius-base);
+  overflow: hidden;
+
+  th.el-table__cell {
+    background-color: #f1f5f9 !important;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  tr:hover > td {
+    background-color: #f8fafc !important;
+  }
+}
+
+/* 卡片主题 - 医疗卡片风格 */
+.el-card {
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: var(--el-box-shadow);
+
+  .el-card__header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    background: linear-gradient(135deg, #ffffff 0%, #fbfdff 100%);
+  }
+
+  .el-card__body {
+    padding: 24px;
+  }
+}
+
+/* 对话框主题 - 医疗确认弹窗 */
+.el-dialog {
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+  .el-dialog__header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-right: 0;
+  }
+
+  .el-dialog__title {
+    font-weight: 600;
+    font-size: 18px;
+    color: #1e293b;
+  }
+
+  .el-dialog__body {
+    padding: 24px;
+  }
+
+  .el-dialog__footer {
+    padding: 16px 24px 24px;
+    border-top: 1px solid #e2e8f0;
+  }
+}
+
+/* 标签主题 - 医疗状态标签 */
+.el-tag {
+  border-radius: 6px;
+  font-weight: 500;
+
+  &.el-tag--primary {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border-color: #bbdefb;
+  }
+
+  &.el-tag--success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border-color: #c8e6c9;
+  }
+
+  &.el-tag--warning {
+    background-color: #fff3e0;
+    color: #ef6c00;
+    border-color: #ffe0b2;
+  }
+
+  &.el-tag--danger {
+    background-color: #ffebee;
+    color: #c62828;
+    border-color: #ffcdd2;
+  }
+
+  &.el-tag--info {
+    background-color: #eceff1;
+    color: #546e7a;
+    border-color: #cfd8dc;
+  }
+}
+
+/* 分页主题 */
+.el-pagination {
+  .el-pager li {
+    border-radius: 8px;
+    margin: 0 4px;
+    font-weight: 500;
+
+    &.is-active {
+      background: linear-gradient(135deg, #1e88e5 0%, #42a5f5 100%);
+      color: white;
+    }
+
+    &:hover:not(.is-active) {
+      background-color: #e3f2fd;
+      color: #1e88e5;
+    }
+  }
+
+  button {
+    border-radius: 8px;
+
+    &:hover:not(:disabled) {
+      background-color: #e3f2fd;
+      color: #1e88e5;
+    }
+  }
+}
+
+/* 消息提示主题 */
+.el-message {
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 14px 20px;
+
+  .el-message__icon {
+    font-size: 18px;
+  }
+
+  .el-message__content {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+/* 下拉菜单主题 */
+.el-dropdown-menu {
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e2e8f0;
+  padding: 8px;
+
+  .el-dropdown-menu__item {
+    border-radius: 8px;
+    margin: 2px 0;
+    padding: 10px 14px;
+    font-weight: 500;
+
+    &:hover {
+      background-color: #e3f2fd;
+      color: #1e88e5;
+    }
+  }
+}
+
+/* 消息盒子主题 */
+.el-message-box {
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+  .el-message-box__header {
+    padding: 24px 24px 16px;
+  }
+
+  .el-message-box__title {
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  .el-message-box__content {
+    padding: 0 24px 24px;
+  }
+
+  .el-message-box__btns {
+    padding: 0 24px 24px;
+  }
+}
+
+/* 开关主题 */
+.el-switch.is-checked {
+  .el-switch__core {
+    background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+    border-color: #2e7d32;
+  }
+}
+
+/* 徽章主题 */
+.el-badge__content.is-fixed {
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(135deg, #c62828 0%, #ef5350 100%);
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(198, 40, 40, 0.3);
+}
+
+/* 加载主题 */
+.el-loading-mask {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.el-loading-spinner .circular {
+  stroke: #1e88e5;
+}
+
+/* 面包屑主题 */
+.el-breadcrumb__inner {
+  font-weight: 500;
+
+  &.is-link {
+    color: #1e88e5;
+
+    &:hover {
+      color: #1565c0;
+    }
+  }
+}
+
+/* 选择器下拉菜单 */
+.el-select-dropdown__item.selected {
+  color: #1e88e5;
+  font-weight: 600;
+  background-color: #e3f2fd;
+}
+
+.el-select-dropdown__item.hover,
+.el-select-dropdown__item:hover {
+  background-color: #f1f5f9;
+}
+
+/* 步骤条主题 */
+.el-steps {
+  .el-step__head.is-finish {
+    color: #2e7d32;
+    border-color: #2e7d32;
+  }
+
+  .el-step__title.is-finish {
+    color: #2e7d32;
+  }
+
+  .el-step__head.is-process {
+    color: #1e88e5;
+    border-color: #1e88e5;
+  }
+
+  .el-step__title.is-process {
+    color: #1e88e5;
+  }
+}
+
+/* 日期选择器主题 */
+.el-picker-panel {
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e2e8f0;
+}
+
+/* 空状态主题 */
+.el-empty__description p {
+  color: #64748b;
+  font-size: 14px;
+}

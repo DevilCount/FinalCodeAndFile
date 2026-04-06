@@ -1,0 +1,156 @@
+# 增强版报告服务测试配置
+spring:
+  # 数据源配置
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  # H2数据库控制台（可选）
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # JPA配置
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  
+  # Redis配置（测试环境使用内存Redis）
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 3000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+  
+  # 缓存配置
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000  # 5分钟
+      cache-null-values: false
+
+# MyBatis Plus配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: deleted  # 逻辑删除字段名
+      logic-delete-value: 1        # 逻辑删除值
+      logic-not-delete-value: 0    # 逻辑未删除值
+
+# 日志配置
+logging:
+  level:
+    com.sunyaxin: DEBUG
+    org.springframework.cache: DEBUG
+    org.springframework.transaction: DEBUG
+
+# 服务端口
+server:
+  port: 8081
+
+# 自定义配置
+lab:
+  # AI服务配置
+  ai:
+    enabled: true
+    endpoint: http://localhost:9090/api/ai
+    timeout: 5000
+    
+  # 报告编号生成配置
+  report:
+    no-prefix: REP
+    date-format: yyyyMMdd
+    sequence-length: 3
+    
+  # 缓存配置
+  cache:
+    report-stats-ttl: 300      # 报告统计缓存5分钟
+    today-stats-ttl: 180       # 今日统计缓存3分钟
+    status-stats-ttl: 600      # 状态统计缓存10分钟
+    
+  # 审核流程配置
+  review:
+    technical:
+      timeout-hours: 24        # 技术审核超时时间
+      reminder-hours: 12       # 提醒时间
+    clinical:
+      timeout-hours: 48        # 临床审核超时时间
+      reminder-hours: 24       # 提醒时间
+      
+  # 异常指标配置
+  abnormal:
+    critical-threshold: 3      # 危急值阈值
+    warning-threshold: 1       # 警告阈值
+
+# 测试专用配置
+test:
+  mode: true
+  mock:
+    ai-service: true           # 模拟AI服务
+    redis: false              # 使用真实Redis（测试时可以改为true使用Mock）
+    
+# Feign客户端配置
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 5000
+        read-timeout: 10000
+        logger-level: basic
+  hystrix:
+    enabled: true
+    command:
+      default:
+        execution:
+          isolation:
+            thread:
+              timeoutInMilliseconds: 10000
+  circuitbreaker:
+    enabled: true
+    instances:
+      ai-service:
+        register-health-indicator: true
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 5
+        wait-duration-in-open-state: 5000
+        failure-rate-threshold: 50
+        
+# 服务发现配置（测试环境禁用）
+spring.cloud:
+  nacos:
+    discovery:
+      enabled: false
+  loadbalancer:
+    enabled: false
+    
+# 健康检查配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+      
+# Swagger配置
+springfox:
+  documentation:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html

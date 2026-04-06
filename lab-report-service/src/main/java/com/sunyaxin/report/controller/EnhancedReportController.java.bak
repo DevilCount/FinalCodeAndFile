@@ -1,0 +1,320 @@
+package com.sunyaxin.report.controller;
+
+import com.sunyaxin.common.result.Result;
+import com.sunyaxin.report.dto.EnhancedReportDTO;
+import com.sunyaxin.report.dto.ReportStatisticsDTO;
+import com.sunyaxin.report.dto.ReviewDTO;
+import com.sunyaxin.report.dto.TestResultItemDTO;
+import com.sunyaxin.report.service.EnhancedReportService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 增强版报告控制器
+ * 提供双层审核流程、AI诊断集成、统计分析等高级功能
+ */
+@Slf4j
+@Api(tags = "增强版报告管理")
+// @RestController
+// @RequestMapping("/enhanced/report")
+@RequiredArgsConstructor
+public class EnhancedReportController {
+
+    private final EnhancedReportService enhancedReportService;
+
+    // ==================== 报告创建与录入 ====================
+
+    @ApiOperation("创建增强版报告（结构化数据）")
+    @PostMapping("/create-enhanced")
+    public Result<com.sunyaxin.common.entity.Report> createEnhancedReport(
+            @RequestBody com.sunyaxin.common.entity.Report report,
+            @RequestBody(required = false) List<TestResultItemDTO> testResults) {
+        log.info("API调用: POST /enhanced/report/create-enhanced");
+        return enhancedReportService.createEnhancedReport(report, testResults);
+    }
+
+    @ApiOperation("录入结构化检验结果")
+    @PostMapping("/{reportId}/input-structured")
+    public Result<com.sunyaxin.common.entity.Report> inputStructuredResults(
+            @PathVariable Long reportId,
+            @RequestBody List<TestResultItemDTO> testResults,
+            @RequestParam Long technicianId,
+            @RequestParam String technicianName) {
+        log.info("API调用: POST /enhanced/report/{}/input-structured", reportId);
+        return enhancedReportService.inputStructuredResults(reportId, testResults, technicianId, technicianName);
+    }
+
+    @ApiOperation("调用AI辅助诊断")
+    @PostMapping("/{reportId}/invoke-ai")
+    public Result<String> invokeAiDiagnosis(
+            @PathVariable Long reportId,
+            @RequestBody(required = false) List<TestResultItemDTO> testResults) {
+        log.info("API调用: POST /enhanced/report/{}/invoke-ai", reportId);
+        return enhancedReportService.invokeAiDiagnosis(reportId, testResults);
+    }
+
+    // ==================== 双层审核流程 ====================
+
+    @ApiOperation("提交技术审核")
+    @PostMapping("/{reportId}/submit-technical-review")
+    public Result<com.sunyaxin.common.entity.Report> submitTechnicalReview(
+            @PathVariable Long reportId,
+            @RequestParam Long technicianId,
+            @RequestParam String technicianName) {
+        log.info("API调用: POST /enhanced/report/{}/submit-technical-review", reportId);
+        return enhancedReportService.submitTechnicalReview(reportId, technicianId, technicianName);
+    }
+
+    @ApiOperation("进行技术审核")
+    @PostMapping("/{reportId}/perform-technical-review")
+    public Result<com.sunyaxin.common.entity.Report> performTechnicalReview(
+            @PathVariable Long reportId,
+            @RequestBody ReviewDTO review) {
+        log.info("API调用: POST /enhanced/report/{}/perform-technical-review", reportId);
+        return enhancedReportService.performTechnicalReview(reportId, review);
+    }
+
+    @ApiOperation("提交临床审核")
+    @PostMapping("/{reportId}/submit-clinical-review")
+    public Result<com.sunyaxin.common.entity.Report> submitClinicalReview(
+            @PathVariable Long reportId,
+            @RequestParam Long doctorId,
+            @RequestParam String doctorName) {
+        log.info("API调用: POST /enhanced/report/{}/submit-clinical-review", reportId);
+        return enhancedReportService.submitClinicalReview(reportId, doctorId, doctorName);
+    }
+
+    @ApiOperation("进行临床审核")
+    @PostMapping("/{reportId}/perform-clinical-review")
+    public Result<com.sunyaxin.common.entity.Report> performClinicalReview(
+            @PathVariable Long reportId,
+            @RequestBody ReviewDTO review) {
+        log.info("API调用: POST /enhanced/report/{}/perform-clinical-review", reportId);
+        return enhancedReportService.performClinicalReview(reportId, review);
+    }
+
+    @ApiOperation("发布报告")
+    @PostMapping("/{reportId}/publish")
+    public Result<com.sunyaxin.common.entity.Report> publishReport(
+            @PathVariable Long reportId,
+            @RequestParam Long publisherId,
+            @RequestParam String publisherName) {
+        log.info("API调用: POST /enhanced/report/{}/publish", reportId);
+        return enhancedReportService.publishReport(reportId, publisherId, publisherName);
+    }
+
+    @ApiOperation("撤销报告")
+    @PostMapping("/{reportId}/revoke")
+    public Result<com.sunyaxin.common.entity.Report> revokeReport(
+            @PathVariable Long reportId,
+            @RequestParam Long operatorId,
+            @RequestParam String operatorName,
+            @RequestParam String reason) {
+        log.info("API调用: POST /enhanced/report/{}/revoke", reportId);
+        return enhancedReportService.revokeReport(reportId, operatorId, operatorName, reason);
+    }
+
+    @ApiOperation("归档报告")
+    @PostMapping("/{reportId}/archive")
+    public Result<com.sunyaxin.common.entity.Report> archiveReport(
+            @PathVariable Long reportId,
+            @RequestParam Long operatorId,
+            @RequestParam String operatorName) {
+        log.info("API调用: POST /enhanced/report/{}/archive", reportId);
+        return enhancedReportService.archiveReport(reportId, operatorId, operatorName);
+    }
+
+    // ==================== 查询功能 ====================
+
+    @ApiOperation("获取增强版报告详情")
+    @GetMapping("/{reportId}/enhanced-detail")
+    public Result<EnhancedReportDTO> getEnhancedReport(@PathVariable Long reportId) {
+        log.info("API调用: GET /enhanced/report/{}/enhanced-detail", reportId);
+        return enhancedReportService.getEnhancedReport(reportId);
+    }
+
+    @ApiOperation("获取待技术审核报告列表")
+    @GetMapping("/pending-technical-review")
+    public Result<List<EnhancedReportDTO>> getPendingTechnicalReviewReports() {
+        log.info("API调用: GET /enhanced/report/pending-technical-review");
+        return enhancedReportService.getPendingTechnicalReviewReports();
+    }
+
+    @ApiOperation("获取待临床审核报告列表")
+    @GetMapping("/pending-clinical-review")
+    public Result<List<EnhancedReportDTO>> getPendingClinicalReviewReports() {
+        log.info("API调用: GET /enhanced/report/pending-clinical-review");
+        return enhancedReportService.getPendingClinicalReviewReports();
+    }
+
+    @ApiOperation("获取异常报告列表")
+    @GetMapping("/abnormal-reports")
+    public Result<List<EnhancedReportDTO>> getAbnormalReports(
+            @RequestParam(defaultValue = "10") int limit) {
+        log.info("API调用: GET /enhanced/report/abnormal-reports?limit={}", limit);
+        return enhancedReportService.getAbnormalReports(limit);
+    }
+
+    @ApiOperation("获取报告审核时间线")
+    @GetMapping("/{reportId}/review-timeline")
+    public Result<List<com.sunyaxin.report.dto.ReviewTimelineDTO>> getReviewTimeline(@PathVariable Long reportId) {
+        log.info("API调用: GET /enhanced/report/{}/review-timeline", reportId);
+        return enhancedReportService.getReviewTimeline(reportId);
+    }
+
+    // ==================== 统计功能 ====================
+
+    @ApiOperation("获取报告统计信息（带缓存）")
+    @GetMapping("/statistics")
+    public ReportStatisticsDTO getReportStatistics() {
+        log.info("API调用: GET /enhanced/report/statistics");
+        return enhancedReportService.getReportStatistics();
+    }
+
+    @ApiOperation("清除报告统计缓存")
+    @DeleteMapping("/clear-cache")
+    public Result<String> clearReportStatisticsCache() {
+        log.info("API调用: DELETE /enhanced/report/clear-cache");
+        enhancedReportService.clearReportStatisticsCache();
+        return Result.success("报告统计缓存已清除");
+    }
+
+    @ApiOperation("获取今日报告统计概览")
+    @GetMapping("/today-stats")
+    public Map<String, Object> getTodayReportStats() {
+        log.info("API调用: GET /enhanced/report/today-stats");
+        return enhancedReportService.getTodayReportStats();
+    }
+
+    @ApiOperation("统计报告状态分布")
+    @GetMapping("/status-distribution")
+    public Map<String, Long> countReportsByStatus() {
+        log.info("API调用: GET /enhanced/report/status-distribution");
+        return enhancedReportService.countReportsByStatus();
+    }
+
+    @ApiOperation("按日期统计报告数量")
+    @GetMapping("/count-by-date")
+    public Map<String, Long> countReportsByLastDays(
+            @RequestParam(defaultValue = "7") int days) {
+        log.info("API调用: GET /enhanced/report/count-by-date?days={}", days);
+        return enhancedReportService.countReportsByLastDays(days);
+    }
+
+    @ApiOperation("获取检验项目报告量排行")
+    @GetMapping("/hot-items")
+    public List<Map<String, Object>> getHotReportItems(
+            @RequestParam(defaultValue = "10") int limit) {
+        log.info("API调用: GET /enhanced/report/hot-items?limit={}", limit);
+        return enhancedReportService.getHotReportItems(limit);
+    }
+
+    @ApiOperation("获取审核效率统计")
+    @GetMapping("/review-efficiency")
+    public Map<String, Double> getReviewEfficiencyStats(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        log.info("API调用: GET /enhanced/report/review-efficiency?startDate={}&endDate={}", startDate, endDate);
+        return enhancedReportService.getReviewEfficiencyStats(startDate, endDate);
+    }
+
+    // ==================== 批量操作 ====================
+
+    @ApiOperation("批量提交技术审核")
+    @PostMapping("/batch/submit-technical-review")
+    public Result<String> batchSubmitTechnicalReview(
+            @RequestBody List<Long> reportIds,
+            @RequestParam Long technicianId,
+            @RequestParam String technicianName) {
+        log.info("API调用: POST /enhanced/report/batch/submit-technical-review，报告数量: {}", reportIds.size());
+        return enhancedReportService.batchSubmitTechnicalReview(reportIds, technicianId, technicianName);
+    }
+
+    @ApiOperation("批量技术审核")
+    @PostMapping("/batch/perform-technical-review")
+    public Result<String> batchPerformTechnicalReview(
+            @RequestBody List<Long> reportIds,
+            @RequestBody ReviewDTO review) {
+        log.info("API调用: POST /enhanced/report/batch/perform-technical-review，报告数量: {}", reportIds.size());
+        return enhancedReportService.batchPerformTechnicalReview(reportIds, review);
+    }
+
+    @ApiOperation("批量提交临床审核")
+    @PostMapping("/batch/submit-clinical-review")
+    public Result<String> batchSubmitClinicalReview(
+            @RequestBody List<Long> reportIds,
+            @RequestParam Long doctorId,
+            @RequestParam String doctorName) {
+        log.info("API调用: POST /enhanced/report/batch/submit-clinical-review，报告数量: {}", reportIds.size());
+        return enhancedReportService.batchSubmitClinicalReview(reportIds, doctorId, doctorName);
+    }
+
+    @ApiOperation("批量临床审核")
+    @PostMapping("/batch/perform-clinical-review")
+    public Result<String> batchPerformClinicalReview(
+            @RequestBody List<Long> reportIds,
+            @RequestBody ReviewDTO review) {
+        log.info("API调用: POST /enhanced/report/batch/perform-clinical-review，报告数量: {}", reportIds.size());
+        return enhancedReportService.batchPerformClinicalReview(reportIds, review);
+    }
+
+    @ApiOperation("批量发布报告")
+    @PostMapping("/batch/publish")
+    public Result<String> batchPublishReports(
+            @RequestBody List<Long> reportIds,
+            @RequestParam Long publisherId,
+            @RequestParam String publisherName) {
+        log.info("API调用: POST /enhanced/report/batch/publish，报告数量: {}", reportIds.size());
+        return enhancedReportService.batchPublishReports(reportIds, publisherId, publisherName);
+    }
+
+    @ApiOperation("批量归档报告")
+    @PostMapping("/batch/archive")
+    public Result<String> batchArchiveReports(
+            @RequestBody List<Long> reportIds,
+            @RequestParam Long operatorId,
+            @RequestParam String operatorName) {
+        log.info("API调用: POST /enhanced/report/batch/archive，报告数量: {}", reportIds.size());
+        return enhancedReportService.batchArchiveReports(reportIds, operatorId, operatorName);
+    }
+
+    // ==================== 数据导入导出 ====================
+
+    @ApiOperation("导出报告数据到Excel")
+    @GetMapping("/export/excel")
+    public byte[] exportReportsToExcel(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String testItems,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        log.info("API调用: GET /enhanced/report/export/excel");
+        return enhancedReportService.exportReportsToExcel(keyword, status, testItems, startDate, endDate);
+    }
+
+    @ApiOperation("从Excel导入报告数据")
+    @PostMapping("/import/excel")
+    public Result<String> importReportsFromExcel(
+            @RequestBody byte[] excelData,
+            @RequestParam Long operatorId,
+            @RequestParam String operatorName) {
+        log.info("API调用: POST /enhanced/report/import/excel");
+        return enhancedReportService.importReportsFromExcel(excelData, operatorId, operatorName);
+    }
+
+    @ApiOperation("导出报告审核流程到PDF")
+    @GetMapping("/{reportId}/export-review-pdf")
+    public byte[] exportReportReviewProcessToPdf(@PathVariable Long reportId) {
+        log.info("API调用: GET /enhanced/report/{}/export-review-pdf", reportId);
+        return enhancedReportService.exportReportReviewProcessToPdf(reportId);
+    }
+}

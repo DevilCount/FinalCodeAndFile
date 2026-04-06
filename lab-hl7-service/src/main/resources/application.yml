@@ -1,0 +1,73 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: lab-hl7-service
+  cloud:
+    nacos:
+      discovery:
+        enabled: true
+        server-addr: ${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+        namespace: ${NACOS_NAMESPACE:lab-dev}
+        weight: 1
+        metadata:
+          version: 1.0.0
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${MYSQL_URL:jdbc:mysql://127.0.0.1:3306/lab_management?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai}
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:1234}
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: LabHikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+
+# Actuator配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+    info:
+      enabled: true
+  server:
+    port: 8084
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.sunyaxin: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+  file:
+    name: logs/hl7-service.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 100MB
+
+# HL7配置
+hl7:
+  # HIS系统MLLP连接配置
+  his:
+    host: 127.0.0.1
+    port: 2575
+    timeout: 5000
+  # 本地MLLP监听配置
+  server:
+    port: 2576
