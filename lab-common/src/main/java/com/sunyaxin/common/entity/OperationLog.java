@@ -1,7 +1,6 @@
 package com.sunyaxin.common.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -9,7 +8,6 @@ import java.time.LocalDateTime;
 /**
  * 操作日志实体 - 用于记录关键业务操作
  */
-@Data
 @TableName("operation_log")
 public class OperationLog implements Serializable {
 
@@ -103,4 +101,148 @@ public class OperationLog implements Serializable {
      */
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
+    }
+
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
+    }
+
+    public String getOperationType() {
+        return operationType;
+    }
+
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
+    }
+
+    public String getOperationDesc() {
+        return operationDesc;
+    }
+
+    public void setOperationDesc(String operationDesc) {
+        this.operationDesc = operationDesc;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public Long getTargetId() {
+        return targetId;
+    }
+
+    public void setTargetId(Long targetId) {
+        this.targetId = targetId;
+    }
+
+    public String getTargetNo() {
+        return targetNo;
+    }
+
+    public void setTargetNo(String targetNo) {
+        this.targetNo = targetNo;
+    }
+
+    public String getRequestIp() {
+        return requestIp;
+    }
+
+    public void setRequestIp(String requestIp) {
+        this.requestIp = requestIp;
+    }
+
+    public String getRequestMethod() {
+        return requestMethod;
+    }
+
+    public void setRequestMethod(String requestMethod) {
+        this.requestMethod = requestMethod;
+    }
+
+    public String getRequestParams() {
+        return requestParams;
+    }
+
+    public void setRequestParams(String requestParams) {
+        this.requestParams = requestParams;
+    }
+
+    public String getResponseResult() {
+        return responseResult;
+    }
+
+    public void setResponseResult(String responseResult) {
+        this.responseResult = responseResult;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
+
+    public Integer getCostTimeMs() {
+        return costTimeMs;
+    }
+
+    public void setCostTimeMs(Integer costTimeMs) {
+        this.costTimeMs = costTimeMs;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
 }

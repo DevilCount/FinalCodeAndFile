@@ -1,7 +1,6 @@
 package com.sunyaxin.common.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -9,7 +8,6 @@ import java.time.LocalDateTime;
 /**
  * 标本类型字典实体
  */
-@Data
 @TableName("sample_type")
 public class SampleType implements Serializable {
 
@@ -58,4 +56,76 @@ public class SampleType implements Serializable {
      */
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTypeCode() {
+        return typeCode;
+    }
+
+    public void setTypeCode(String typeCode) {
+        this.typeCode = typeCode;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public String getTypeAlias() {
+        return typeAlias;
+    }
+
+    public void setTypeAlias(String typeAlias) {
+        this.typeAlias = typeAlias;
+    }
+
+    public String getContainerType() {
+        return containerType;
+    }
+
+    public void setContainerType(String containerType) {
+        this.containerType = containerType;
+    }
+
+    public String getStorageCondition() {
+        return storageCondition;
+    }
+
+    public void setStorageCondition(String storageCondition) {
+        this.storageCondition = storageCondition;
+    }
+
+    public Integer getSortOrder() {
+        return sortOrder;
+    }
+
+    public void setSortOrder(Integer sortOrder) {
+        this.sortOrder = sortOrder;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
 }

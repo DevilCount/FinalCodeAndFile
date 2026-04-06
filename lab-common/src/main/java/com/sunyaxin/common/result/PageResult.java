@@ -1,18 +1,11 @@
 package com.sunyaxin.common.result;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 import java.util.List;
 
 /**
  * 分页结果
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class PageResult<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -51,6 +44,75 @@ public class PageResult<T> implements Serializable {
      * 是否有下一页
      */
     private Boolean hasNext;
+
+    public PageResult() {
+    }
+
+    public PageResult(Long current, Long size, Long total, Long pages, List<T> records, Boolean hasPrevious, Boolean hasNext) {
+        this.current = current;
+        this.size = size;
+        this.total = total;
+        this.pages = pages;
+        this.records = records;
+        this.hasPrevious = hasPrevious;
+        this.hasNext = hasNext;
+    }
+
+    public Long getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(Long current) {
+        this.current = current;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
+    }
+
+    public Long getTotal() {
+        return total;
+    }
+
+    public void setTotal(Long total) {
+        this.total = total;
+    }
+
+    public Long getPages() {
+        return pages;
+    }
+
+    public void setPages(Long pages) {
+        this.pages = pages;
+    }
+
+    public List<T> getRecords() {
+        return records;
+    }
+
+    public void setRecords(List<T> records) {
+        this.records = records;
+    }
+
+    public Boolean getHasPrevious() {
+        return hasPrevious;
+    }
+
+    public void setHasPrevious(Boolean hasPrevious) {
+        this.hasPrevious = hasPrevious;
+    }
+
+    public Boolean getHasNext() {
+        return hasNext;
+    }
+
+    public void setHasNext(Boolean hasNext) {
+        this.hasNext = hasNext;
+    }
 
     /**
      * 构建分页结果

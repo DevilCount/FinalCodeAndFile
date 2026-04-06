@@ -1,7 +1,6 @@
 package com.sunyaxin.common.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -11,7 +10,6 @@ import java.time.LocalDateTime;
  * 检验项目实体
  * 参考数据字典 LIS_ITEM 简化版
  */
-@Data
 @TableName("lab_test_item")
 public class TestItem implements Serializable {
 
@@ -122,4 +120,172 @@ public class TestItem implements Serializable {
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getItemCode() {
+        return itemCode;
+    }
+
+    public void setItemCode(String itemCode) {
+        this.itemCode = itemCode;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public String getItemShortName() {
+        return itemShortName;
+    }
+
+    public void setItemShortName(String itemShortName) {
+        this.itemShortName = itemShortName;
+    }
+
+    public String getEnglishName() {
+        return englishName;
+    }
+
+    public void setEnglishName(String englishName) {
+        this.englishName = englishName;
+    }
+
+    public String getLoincCode() {
+        return loincCode;
+    }
+
+    public void setLoincCode(String loincCode) {
+        this.loincCode = loincCode;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getSampleType() {
+        return sampleType;
+    }
+
+    public void setSampleType(String sampleType) {
+        this.sampleType = sampleType;
+    }
+
+    public String getResultType() {
+        return resultType;
+    }
+
+    public void setResultType(String resultType) {
+        this.resultType = resultType;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public Integer getDecimalPlaces() {
+        return decimalPlaces;
+    }
+
+    public void setDecimalPlaces(Integer decimalPlaces) {
+        this.decimalPlaces = decimalPlaces;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public Integer getPrintOrder() {
+        return printOrder;
+    }
+
+    public void setPrintOrder(Integer printOrder) {
+        this.printOrder = printOrder;
+    }
+
+    public String getTestMethod() {
+        return testMethod;
+    }
+
+    public void setTestMethod(String testMethod) {
+        this.testMethod = testMethod;
+    }
+
+    public String getItemDesc() {
+        return itemDesc;
+    }
+
+    public void setItemDesc(String itemDesc) {
+        this.itemDesc = itemDesc;
+    }
+
+    public String getClinicalMeaning() {
+        return clinicalMeaning;
+    }
+
+    public void setClinicalMeaning(String clinicalMeaning) {
+        this.clinicalMeaning = clinicalMeaning;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Integer getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Integer deleted) {
+        this.deleted = deleted;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
+    }
 }

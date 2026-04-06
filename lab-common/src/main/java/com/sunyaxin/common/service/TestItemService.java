@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sunyaxin.common.entity.TestItem;
 import com.sunyaxin.common.mapper.TestItemMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -15,11 +15,10 @@ import java.util.List;
 /**
  * 检验项目管理服务 - 带Redis缓存
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class TestItemService extends ServiceImpl<TestItemMapper, TestItem> {
 
+    private static final Logger log = LoggerFactory.getLogger(TestItemService.class);
     /**
      * 缓存名称
      */

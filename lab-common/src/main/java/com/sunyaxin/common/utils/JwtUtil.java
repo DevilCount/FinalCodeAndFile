@@ -3,7 +3,8 @@ package com.sunyaxin.common.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -23,9 +24,10 @@ import java.util.function.Function;
  * - setSigningKey() -> verifyWith()
  * - setClaims/subject/issuedAt/expiration -> 链式调用
  */
-@Slf4j
 @Component
 public class JwtUtil {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
 
     @Value("${jwt.secret:LabManagementSystemSecretKey2024!@#$%ForJWTTokenGeneration}")
     private String secret;

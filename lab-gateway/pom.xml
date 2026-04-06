@@ -81,6 +81,7 @@
 
     <build>
         <plugins>
+            <!-- 暂时注释掉，等待网络问题解决
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -93,6 +94,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
     </build>
 </project>

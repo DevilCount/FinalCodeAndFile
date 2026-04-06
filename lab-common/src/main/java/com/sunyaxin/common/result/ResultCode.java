@@ -1,13 +1,8 @@
 package com.sunyaxin.common.result;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 /**
  * 响应状态码枚举
  */
-@Getter
-@AllArgsConstructor
 public enum ResultCode {
 
     // ========== 成功 ==========
@@ -48,4 +43,17 @@ public enum ResultCode {
 
     private final Integer code;
     private final String message;
+
+    ResultCode(Integer code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }

@@ -1,11 +1,8 @@
 package com.sunyaxin.common.exception;
 
-import lombok.Getter;
-
 /**
  * 业务异常
  */
-@Getter
 public class BusinessException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
@@ -29,5 +26,14 @@ public class BusinessException extends RuntimeException {
         super(message, cause);
         this.code = code;
         this.message = message;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
     }
 }

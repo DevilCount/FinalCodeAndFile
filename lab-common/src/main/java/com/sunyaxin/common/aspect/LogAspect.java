@@ -1,11 +1,12 @@
 package com.sunyaxin.common.aspect;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -18,11 +19,11 @@ import java.util.Map;
 /**
  * 请求日志AOP切面
  */
-@Slf4j
 @Aspect
 @Component
 public class LogAspect {
 
+    private static final Logger log = LoggerFactory.getLogger(LogAspect.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**

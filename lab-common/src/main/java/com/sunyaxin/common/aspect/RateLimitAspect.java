@@ -5,12 +5,12 @@ import com.sunyaxin.common.exception.BusinessException;
 import com.sunyaxin.common.result.ResultCode;
 import com.sunyaxin.common.utils.RedisUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -18,13 +18,16 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 /**
  * 接口限流切面
  */
-@Slf4j
 @Aspect
 @Component
-@RequiredArgsConstructor
 public class RateLimitAspect {
 
+    private static final Logger log = LoggerFactory.getLogger(RateLimitAspect.class);
     private final RedisUtils redisUtils;
+
+    public RateLimitAspect(RedisUtils redisUtils) {
+        this.redisUtils = redisUtils;
+    }
 
     @Around("@annotation(com.sunyaxin.common.annotation.RateLimit)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {

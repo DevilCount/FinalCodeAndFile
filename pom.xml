@@ -32,10 +32,19 @@
         <spring-cloud-alibaba.version>2023.0.1.2</spring-cloud-alibaba.version>
         <mybatis-plus.version>3.5.7</mybatis-plus.version>
         <hutool.version>5.8.22</hutool.version>
+        <lombok.version>1.18.30</lombok.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- Lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <optional>true</optional>
+            </dependency>
+            
             <!-- Spring Boot -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -144,11 +153,13 @@
 
     <build>
         <plugins>
+            <!-- 暂时注释掉，等待网络问题解决
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
             </plugin>
+            -->
         </plugins>
     </build>
 </project>

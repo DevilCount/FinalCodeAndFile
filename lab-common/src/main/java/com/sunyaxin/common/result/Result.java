@@ -1,14 +1,12 @@
 package com.sunyaxin.common.result;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
 
 import java.io.Serializable;
 
 /**
  * 统一返回结果
  */
-@Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Result<T> implements Serializable {
 
@@ -55,6 +53,46 @@ public class Result<T> implements Serializable {
         this.message = message;
         this.data = data;
         this.timestamp = System.currentTimeMillis();
+        this.path = path;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
         this.path = path;
     }
 
